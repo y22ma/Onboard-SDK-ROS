@@ -118,6 +118,25 @@ void DJISDKNode::broadcast_callback()
         gimbal_publisher.publish(gimbal);
     }
 
+    // update imu msg
+    if (msg_flags && HAS_Q && HAS_W && HAS_A)
+    {
+        sensor_msgs::Imu imu_msg;
+        imu_msg.header.frame_id = "/world";
+        imu_msg.header.stamp = current_time;
+        imu_msg.orientation.x = bc_data.q.q0;
+        imu_msg.orientation.y = bc_data.q.q1;
+        imu_msg.orientation.z = bc_data.q.q2;
+        imu_msg.orientation.w = bc_data.q.q3;
+        imu_msg.linear_acceleration.x = bc_data.a.x;
+        imu_msg.linear_acceleration.y = bc_data.a.y;
+        imu_msg.linear_acceleration.z = bc_data.a.z;
+        imu_msg.angular_velocity.x = bc_data.w.x;
+        imu_msg.angular_velocity.y = bc_data.w.y;
+        imu_msg.angular_velocity.z = bc_data.w.z;
+        imu_publisher.publish(imu_msg);
+    }
+
     //update odom msg
     if ( (msg_flags & HAS_POS) && (msg_flags & HAS_Q) && (msg_flags & HAS_W) && (msg_flags & HAS_V) ) {
         odometry.header.frame_id = "/world";

@@ -2,6 +2,7 @@
 #define __DJI_SDK_NODE_H__
 
 #include <ros/ros.h>
+#include <sensor_msgs/Imu.h>
 #include <nav_msgs/Odometry.h>
 #include <std_msgs/UInt8.h>
 #include <boost/bind.hpp>
@@ -33,10 +34,10 @@ private:
     dji_sdk::RCChannels rc_channels;
     dji_sdk::Velocity velocity;
     nav_msgs::Odometry odometry;
-	dji_sdk::TimeStamp time_stamp;
+    dji_sdk::TimeStamp time_stamp;
 
 
-	bool activation_result = false;
+    bool activation_result = false;
     bool localposbase_use_height = true;
 
     int global_position_ref_seted = 0;
@@ -44,13 +45,14 @@ private:
 //internal variables
     DJISDKMission* dji_sdk_mission;
     char app_key[65];
-	unsigned char transparent_transmission_data[100];
+    unsigned char transparent_transmission_data[100];
     ActivateData user_act_data;
 
 //Publishers:
-	ros::Publisher activation_publisher;
+    ros::Publisher activation_publisher;
     ros::Publisher acceleration_publisher;
     ros::Publisher attitude_quaternion_publisher;
+    ros::Publisher imu_publisher;
     ros::Publisher compass_publisher;
     ros::Publisher flight_control_info_publisher;
     ros::Publisher flight_status_publisher;
@@ -67,7 +69,7 @@ private:
     void init_publishers(ros::NodeHandle& nh)
     {
         // start ros publisher
-		activation_publisher = nh.advertise<std_msgs::UInt8>("dji_sdk/activation", 10);
+	activation_publisher = nh.advertise<std_msgs::UInt8>("dji_sdk/activation", 10);
         acceleration_publisher = nh.advertise<dji_sdk::Acceleration>("dji_sdk/acceleration", 10);
         attitude_quaternion_publisher = nh.advertise<dji_sdk::AttitudeQuaternion>("dji_sdk/attitude_quaternion", 10);
         compass_publisher = nh.advertise<dji_sdk::Compass>("dji_sdk/compass", 10);
@@ -81,7 +83,8 @@ private:
         velocity_publisher = nh.advertise<dji_sdk::Velocity>("dji_sdk/velocity", 10);
         odometry_publisher = nh.advertise<nav_msgs::Odometry>("dji_sdk/odometry",10);
         time_stamp_publisher = nh.advertise<dji_sdk::TimeStamp>("dji_sdk/time_stamp", 10);
-		data_received_from_remote_device_publisher = nh.advertise<dji_sdk::TransparentTransmissionData>("dji_sdk/data_received_from_remote_device",10);
+        imu_publisher = nh.advertise<sensor_msgs::Imu>("dji_sdk/imu/data", 10);
+	data_received_from_remote_device_publisher = nh.advertise<dji_sdk::TransparentTransmissionData>("dji_sdk/data_received_from_remote_device",10);
     }
 
 //Services:
@@ -96,15 +99,15 @@ private:
     ros::ServiceServer sdk_permission_control_service;
     ros::ServiceServer velocity_control_service;
     ros::ServiceServer version_check_service;
-	ros::ServiceServer send_data_to_remote_device_service;
+    ros::ServiceServer send_data_to_remote_device_service;
 
-	ros::ServiceServer virtual_rc_enable_control_service;
-	ros::ServiceServer virtual_rc_data_control_service;
-	ros::ServiceServer drone_arm_control_service;
-	ros::ServiceServer sync_flag_control_service;
-	ros::ServiceServer message_frequency_control_service;
+    ros::ServiceServer virtual_rc_enable_control_service;
+    ros::ServiceServer virtual_rc_data_control_service;
+    ros::ServiceServer drone_arm_control_service;
+    ros::ServiceServer sync_flag_control_service;
+    ros::ServiceServer message_frequency_control_service;
 
-	bool activation_callback(dji_sdk::Activation::Request& request, dji_sdk::Activation::Response& response);
+    bool activation_callback(dji_sdk::Activation::Request& request, dji_sdk::Activation::Response& response);
     bool attitude_control_callback(dji_sdk::AttitudeControl::Request& request, dji_sdk::AttitudeControl::Response& response);
     bool camera_action_control_callback(dji_sdk::CameraActionControl::Request& request, dji_sdk::CameraActionControl::Response& response);
     bool drone_task_control_callback(dji_sdk::DroneTaskControl::Request& request, dji_sdk::DroneTaskControl::Response& response);

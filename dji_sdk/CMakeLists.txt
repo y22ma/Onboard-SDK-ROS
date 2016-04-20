@@ -6,6 +6,7 @@ project(dji_sdk)
 ## is used, also find other catkin packages
 find_package(catkin REQUIRED COMPONENTS
   geometry_msgs
+  sensor_msgs
   message_generation
   nav_msgs
   roscpp
@@ -152,7 +153,7 @@ generate_messages(
 catkin_package(
   INCLUDE_DIRS include
 #  LIBRARIES dji_sdk
-  CATKIN_DEPENDS message_runtime actionlib actionlib_msgs geometry_msgs nav_msgs std_msgs dji_sdk_lib
+  CATKIN_DEPENDS message_runtime actionlib actionlib_msgs geometry_msgs nav_msgs std_msgs dji_sdk_lib sensor_msgs
 #  DEPENDS system_lib
 )
 
