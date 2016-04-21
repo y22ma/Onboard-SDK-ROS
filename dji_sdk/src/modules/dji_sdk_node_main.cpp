@@ -122,7 +122,7 @@ void DJISDKNode::broadcast_callback()
     if (msg_flags && HAS_Q && HAS_W && HAS_A)
     {
         sensor_msgs::Imu imu_msg;
-        imu_msg.header.frame_id = "/world";
+        imu_msg.header.frame_id = "/imu";
         imu_msg.header.stamp = current_time;
         imu_msg.orientation.x = bc_data.q.q0;
         imu_msg.orientation.y = bc_data.q.q1;
