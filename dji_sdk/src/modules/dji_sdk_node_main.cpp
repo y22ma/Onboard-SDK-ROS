@@ -124,10 +124,10 @@ void DJISDKNode::broadcast_callback()
         sensor_msgs::Imu imu_msg;
         imu_msg.header.frame_id = "/imu";
         imu_msg.header.stamp = current_time;
-        imu_msg.orientation.x = bc_data.q.q0;
-        imu_msg.orientation.y = bc_data.q.q1;
-        imu_msg.orientation.z = bc_data.q.q2;
-        imu_msg.orientation.w = bc_data.q.q3;
+        imu_msg.orientation.x = bc_data.q.q1;
+        imu_msg.orientation.y = bc_data.q.q2;
+        imu_msg.orientation.z = bc_data.q.q3;
+        imu_msg.orientation.w = bc_data.q.q0;
         imu_msg.linear_acceleration.x = bc_data.a.x;
         imu_msg.linear_acceleration.y = bc_data.a.y;
         imu_msg.linear_acceleration.z = bc_data.a.z;
