@@ -9,6 +9,7 @@
 #include <dji_sdk/dji_sdk.h>
 #include <actionlib/server/simple_action_server.h>
 #include <dji_sdk/dji_sdk_mission.h>
+#include <geometry_msgs/PoseStamped.h>
 
 #define C_EARTH (double) 6378137.0
 #define C_PI (double) 3.141592653589793
@@ -59,6 +60,7 @@ private:
     ros::Publisher gimbal_publisher;
     ros::Publisher global_position_publisher;
     ros::Publisher local_position_publisher;
+    ros::Publisher local_pose_publisher;
     ros::Publisher power_status_publisher;
     ros::Publisher rc_channels_publisher;
     ros::Publisher velocity_publisher;
@@ -78,6 +80,7 @@ private:
         gimbal_publisher = nh.advertise<dji_sdk::Gimbal>("dji_sdk/gimbal", 10);
         global_position_publisher = nh.advertise<dji_sdk::GlobalPosition>("dji_sdk/global_position", 10);
         local_position_publisher = nh.advertise<dji_sdk::LocalPosition>("dji_sdk/local_position", 10);
+        local_pose_publisher = nh.advertise<geometry_msgs::PoseStamped>("dji_sdk/local_pose", 10);
         power_status_publisher = nh.advertise<dji_sdk::PowerStatus>("dji_sdk/power_status", 10);
         rc_channels_publisher = nh.advertise<dji_sdk::RCChannels>("dji_sdk/rc_channels", 10);
         velocity_publisher = nh.advertise<dji_sdk::Velocity>("dji_sdk/velocity", 10);

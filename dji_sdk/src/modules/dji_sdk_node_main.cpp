@@ -62,25 +62,47 @@ void DJISDKNode::broadcast_callback()
         //TODO:
         // FIX BUG about flying at lat = 0
         if (global_position.ts != 0 && global_position_ref_seted == 0 && global_position.latitude != 0 && global_position.health > 3) {
+            ROS_INFO("HEY");
             global_position_ref = global_position;
             global_position_ref_seted = 1;
         }
 
         //update local_position msg
-        local_position.header.frame_id = "/world";
-        local_position.header.stamp = current_time;
-        gps_convert_ned(
-                local_position.x,
-                local_position.y,
-                global_position.longitude,
-                global_position.latitude,
-                global_position_ref.longitude,
-                global_position_ref.latitude
-                );
-        local_position.z = global_position.height;
-        local_position.ts = global_position.ts;
-        local_position_ref = local_position;
-        local_position_publisher.publish(local_position);
+        if (global_position_ref_seted == 1)
+        {
+            ROS_INFO("%d %d %f %f", global_position.ts, global_position_ref_seted, global_position.longitude, global_position.latitude);
+            local_position.header.frame_id = "/world";
+            local_position.header.stamp = current_time;
+            gps_convert_ned(
+	        local_position.x,
+	        local_position.y,
+	        global_position.longitude,
+	        global_position.latitude,
+	        global_position_ref.longitude,
+	        global_position_ref.latitude
+	    );
+            local_position.z = global_position.height;
+            local_position.ts = global_position.ts;
+            local_position_ref = local_position;
+            local_position_publisher.publish(local_position);
+        } else {
+            ROS_INFO("global reference is not set");
+        }
+    }
+
+    //update global_position msg
+    if ((msg_flags & HAS_POS) && (msg_flags & HAS_Q) && global_position_ref == 1) {
+	geometry_msgs::PoseStamped pose_msg;
+        pose_msg.header.frame_id = "/world";
+        pose_msg.header.stamp = current_time;
+	pose_msg.pose.position.x = local_position.x;
+	pose_msg.pose.position.y = local_position.y;
+        pose_msg.pose.position.z = global_position.height;
+        pose_msg.pose.orientation.x = bc_data.q.q1;
+        pose_msg.pose.orientation.y = bc_data.q.q2;
+        pose_msg.pose.orientation.z = bc_data.q.q3;
+        pose_msg.pose.orientation.w = bc_data.q.q0;
+        local_pose_publisher.publish(pose_msg);
     }
 
 
@@ -119,7 +141,7 @@ void DJISDKNode::broadcast_callback()
     }
 
     // update imu msg
-    if (msg_flags && HAS_Q && HAS_W && HAS_A)
+    if ((msg_flags & HAS_Q) && (msg_flags & HAS_W) && (msg_flags & HAS_A))
     {
         sensor_msgs::Imu imu_msg;
         imu_msg.header.frame_id = "/imu";
@@ -281,7 +303,6 @@ int DJISDKNode::init_parameters(ros::NodeHandle& nh_private)
 
 DJISDKNode::DJISDKNode(ros::NodeHandle& nh, ros::NodeHandle& nh_private) : dji_sdk_mission(nullptr)
 {
-
     init_publishers(nh);
     init_services(nh);
     init_actions(nh);
