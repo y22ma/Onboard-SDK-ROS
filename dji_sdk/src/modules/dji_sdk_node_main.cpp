@@ -24,7 +24,7 @@ void DJISDKNode::broadcast_callback()
     auto current_time = ros::Time::now();
 
     if(msg_flags & HAS_TIME){
-        time_stamp.header.frame_id = "/time";
+        time_stamp.header.frame_id = "time";
         time_stamp.header.stamp = current_time;
         time_stamp.time = bc_data.timeStamp.time;
         time_stamp.time_ns = bc_data.timeStamp.nanoTime;
@@ -34,7 +34,7 @@ void DJISDKNode::broadcast_callback()
 
     //update attitude msg
     if ( (msg_flags & HAS_Q) && (msg_flags & HAS_W) ) {
-        attitude_quaternion.header.frame_id = "/world";
+        attitude_quaternion.header.frame_id = "world";
         attitude_quaternion.header.stamp = current_time;
         attitude_quaternion.q0 = bc_data.q.q0;
         attitude_quaternion.q1 = bc_data.q.q1;
@@ -49,7 +49,7 @@ void DJISDKNode::broadcast_callback()
 
     //update global_position msg
     if (msg_flags & HAS_POS) {
-        global_position.header.frame_id = "/world";
+        global_position.header.frame_id = "world";
         global_position.header.stamp = current_time;
         global_position.ts = bc_data.timeStamp.time;
         global_position.latitude = bc_data.pos.latitude * 180.0 / C_PI;
@@ -62,7 +62,6 @@ void DJISDKNode::broadcast_callback()
         //TODO:
         // FIX BUG about flying at lat = 0
         if (global_position.ts != 0 && global_position_ref_seted == 0 && global_position.latitude != 0 && global_position.health > 3) {
-            ROS_INFO("HEY");
             global_position_ref = global_position;
             global_position_ref_seted = 1;
         }
@@ -71,7 +70,7 @@ void DJISDKNode::broadcast_callback()
         if (global_position_ref_seted == 1)
         {
             ROS_INFO("%d %d %f %f", global_position.ts, global_position_ref_seted, global_position.longitude, global_position.latitude);
-            local_position.header.frame_id = "/world";
+            local_position.header.frame_id = "world";
             local_position.header.stamp = current_time;
             gps_convert_ned(
 	        local_position.x,
@@ -91,9 +90,9 @@ void DJISDKNode::broadcast_callback()
     }
 
     //update global_position msg
-    if ((msg_flags & HAS_POS) && (msg_flags & HAS_Q) && global_position_ref == 1) {
+    if ((msg_flags & HAS_POS) && (msg_flags & HAS_Q) && global_position_ref_seted == 1) {
 	geometry_msgs::PoseStamped pose_msg;
-        pose_msg.header.frame_id = "/world";
+        pose_msg.header.frame_id = "world";
         pose_msg.header.stamp = current_time;
 	pose_msg.pose.position.x = local_position.x;
 	pose_msg.pose.position.y = local_position.y;
@@ -108,7 +107,7 @@ void DJISDKNode::broadcast_callback()
 
     //update velocity msg
     if (msg_flags & HAS_V) {
-        velocity.header.frame_id = "/world";
+        velocity.header.frame_id = "world";
         velocity.header.stamp = current_time;
         velocity.ts = bc_data.timeStamp.time;
         velocity.vx = bc_data.v.x;
@@ -120,7 +119,7 @@ void DJISDKNode::broadcast_callback()
 
     //update acceleration msg
     if (msg_flags & HAS_A) {
-        acceleration.header.frame_id = "/world";
+        acceleration.header.frame_id = "world";
         acceleration.header.stamp = current_time;
         acceleration.ts = bc_data.timeStamp.time;
         acceleration.ax = bc_data.a.x;
@@ -131,7 +130,7 @@ void DJISDKNode::broadcast_callback()
 
     //update gimbal msg
     if (msg_flags & HAS_GIMBAL) {
-        gimbal.header.frame_id = "/gimbal";
+        gimbal.header.frame_id = "gimbal";
         gimbal.header.stamp= current_time;
         gimbal.ts = bc_data.timeStamp.time;
         gimbal.roll = bc_data.gimbal.roll;
@@ -144,7 +143,7 @@ void DJISDKNode::broadcast_callback()
     if ((msg_flags & HAS_Q) && (msg_flags & HAS_W) && (msg_flags & HAS_A))
     {
         sensor_msgs::Imu imu_msg;
-        imu_msg.header.frame_id = "/imu";
+        imu_msg.header.frame_id = "imu";
         imu_msg.header.stamp = current_time;
         imu_msg.orientation.x = bc_data.q.q1;
         imu_msg.orientation.y = bc_data.q.q2;
@@ -161,7 +160,7 @@ void DJISDKNode::broadcast_callback()
 
     //update odom msg
     if ( (msg_flags & HAS_POS) && (msg_flags & HAS_Q) && (msg_flags & HAS_W) && (msg_flags & HAS_V) ) {
-        odometry.header.frame_id = "/world";
+        odometry.header.frame_id = "world";
         odometry.header.stamp = current_time;
         odometry.pose.pose.position.x = local_position.x;
         odometry.pose.pose.position.y = local_position.y;
@@ -181,7 +180,7 @@ void DJISDKNode::broadcast_callback()
 
     //update rc_channel msg
     if (msg_flags & HAS_RC) {
-        rc_channels.header.frame_id = "/rc";
+        rc_channels.header.frame_id = "rc";
         rc_channels.header.stamp = current_time;
         rc_channels.ts = bc_data.timeStamp.time;
         rc_channels.pitch = bc_data.rc.pitch;
@@ -195,7 +194,7 @@ void DJISDKNode::broadcast_callback()
 
     //update compass msg
     if (msg_flags & HAS_MAG) {
-        compass.header.frame_id = "/world";
+        compass.header.frame_id = "world";
         compass.header.stamp = current_time;
         compass.ts = bc_data.timeStamp.time;
         compass.x = bc_data.mag.x;
@@ -220,18 +219,18 @@ void DJISDKNode::broadcast_callback()
 
     //update flight control info
     if (msg_flags & HAS_DEVICE) {
-		flight_control_info.control_mode = bc_data.ctrlInfo.data;
+	flight_control_info.control_mode = bc_data.ctrlInfo.data;
         flight_control_info.cur_ctrl_dev_in_navi_mode = bc_data.ctrlInfo.device;
         flight_control_info.serial_req_status = bc_data.ctrlInfo.signature;
-		flight_control_info.virtual_rc_status = bc_data.ctrlInfo.virtualrc;
+	flight_control_info.virtual_rc_status = bc_data.ctrlInfo.virtualrc;
         flight_control_info_publisher.publish(flight_control_info);
     }
 
     //update obtaincontrol msg
-	std_msgs::UInt8 msg;
-	activation_result = bc_data.activation;
-	msg.data = bc_data.activation;
-	activation_publisher.publish(msg);
+    std_msgs::UInt8 msg;
+    activation_result = bc_data.activation;
+    msg.data = bc_data.activation;
+    activation_publisher.publish(msg);
 
 }
 
