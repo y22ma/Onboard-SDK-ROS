@@ -36,6 +36,9 @@ private:
     dji_sdk::Velocity velocity;
     nav_msgs::Odometry odometry;
     dji_sdk::TimeStamp time_stamp;
+    dji_sdk::TimeStamp time_stamp;
+    dji_sdk::A3GPS A3_GPS;
+    dji_sdk::A3RTK A3_RTK;
 
 
     bool activation_result = false;
@@ -67,6 +70,10 @@ private:
     ros::Publisher odometry_publisher;
     ros::Publisher time_stamp_publisher;
     ros::Publisher data_received_from_remote_device_publisher;
+#ifdef SDK_VERSION_3_1_A3
+    ros::Publisher A3_GPS_info_publisher;
+    ros::Publisher A3_RTK_info_publisher;
+#endif
 
     void init_publishers(ros::NodeHandle& nh)
     {
@@ -88,6 +95,10 @@ private:
         time_stamp_publisher = nh.advertise<dji_sdk::TimeStamp>("dji_sdk/time_stamp", 10);
         imu_publisher = nh.advertise<sensor_msgs::Imu>("dji_sdk/imu/data", 10);
 	data_received_from_remote_device_publisher = nh.advertise<dji_sdk::TransparentTransmissionData>("dji_sdk/data_received_from_remote_device",10);
+#ifdef SDK_VERSION_3_1_A3
+        A3_GPS_info_publisher = nh.advertise<dji_sdk::A3GPS>("dji_sdk/A3_GPS", 10);
+        A3_RTK_info_publisher = nh.advertise<dji_sdk::A3RTK>("dji_sdk/A3_RTK", 10);
+#endif
     }
 
     //Services:
