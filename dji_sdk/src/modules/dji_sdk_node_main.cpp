@@ -11,8 +11,9 @@ void DJISDKNode::transparent_transmission_callback(uint8_t *buf, uint8_t len)
 	transparent_transmission_data.data.resize(len);
 	memcpy(&transparent_transmission_data.data[0], buf, len);
 	data_received_from_remote_device_publisher.publish(transparent_transmission_data);
-
 }
+
+
 void DJISDKNode::broadcast_callback()
 {
     DJI::onboardSDK::BroadcastData bc_data = rosAdapter->coreAPI->getBroadcastData();
@@ -85,7 +86,7 @@ void DJISDKNode::broadcast_callback()
             local_position_ref = local_position;
             local_position_publisher.publish(local_position);
         } else {
-            ROS_INFO("global reference is not set");
+            ROS_WARN("global reference is not set");
         }
     }
 
