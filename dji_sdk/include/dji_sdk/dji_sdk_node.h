@@ -36,7 +36,6 @@ private:
     dji_sdk::Velocity velocity;
     nav_msgs::Odometry odometry;
     dji_sdk::TimeStamp time_stamp;
-    dji_sdk::TimeStamp time_stamp;
     dji_sdk::A3GPS A3_GPS;
     dji_sdk::A3RTK A3_RTK;
 
