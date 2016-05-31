@@ -5,6 +5,7 @@
 #include <sensor_msgs/Imu.h>
 #include <nav_msgs/Odometry.h>
 #include <std_msgs/UInt8.h>
+#include <sensor_msgs/NavSatFix.h>
 #include <boost/bind.hpp>
 #include <dji_sdk/dji_sdk.h>
 #include <actionlib/server/simple_action_server.h>
@@ -38,7 +39,7 @@ private:
     dji_sdk::TimeStamp time_stamp;
     dji_sdk::A3GPS A3_GPS;
     dji_sdk::A3RTK A3_RTK;
-
+    sensor_msgs::NavSatFix navsatfix;
 
     bool activation_result = false;
     bool localposbase_use_height = true;
@@ -61,6 +62,7 @@ private:
     ros::Publisher flight_status_publisher;
     ros::Publisher gimbal_publisher;
     ros::Publisher global_position_publisher;
+    ros::Publisher global_navsatfix_publisher;
     ros::Publisher local_position_publisher;
     ros::Publisher local_pose_publisher;
     ros::Publisher power_status_publisher;
@@ -85,6 +87,7 @@ private:
         flight_status_publisher = nh.advertise<std_msgs::UInt8>("dji_sdk/flight_status", 10);
         gimbal_publisher = nh.advertise<dji_sdk::Gimbal>("dji_sdk/gimbal", 10);
         global_position_publisher = nh.advertise<dji_sdk::GlobalPosition>("dji_sdk/global_position", 10);
+        global_navsatfix_publisher = nh.advertise<sensor_msgs::NavSatFix>("dji_sdk/global_navsatfix", 10);
         local_position_publisher = nh.advertise<dji_sdk::LocalPosition>("dji_sdk/local_position", 10);
         local_pose_publisher = nh.advertise<geometry_msgs::PoseStamped>("dji_sdk/local_pose", 10);
         power_status_publisher = nh.advertise<dji_sdk::PowerStatus>("dji_sdk/power_status", 10);
@@ -113,13 +116,12 @@ private:
     ros::ServiceServer velocity_control_service;
     ros::ServiceServer version_check_service;
     ros::ServiceServer send_data_to_remote_device_service;
-
     ros::ServiceServer virtual_rc_enable_control_service;
     ros::ServiceServer virtual_rc_data_control_service;
     ros::ServiceServer drone_arm_control_service;
     ros::ServiceServer sync_flag_control_service;
     ros::ServiceServer message_frequency_control_service;
-
+    
     bool activation_callback(dji_sdk::Activation::Request& request, dji_sdk::Activation::Response& response);
     bool attitude_control_callback(dji_sdk::AttitudeControl::Request& request, dji_sdk::AttitudeControl::Response& response);
     bool camera_action_control_callback(dji_sdk::CameraActionControl::Request& request, dji_sdk::CameraActionControl::Response& response);
@@ -218,8 +220,8 @@ private:
     bool process_waypoint(dji_sdk::Waypoint new_waypoint);
 
     void gps_convert_ned(float &ned_x, float &ned_y,
-            double gps_t_lon, double gps_t_lat,
-            double gps_r_lon, double gps_r_lat);
+        double gps_t_lon, double gps_t_lat,
+        double gps_r_lon, double gps_r_lat);
 
     dji_sdk::LocalPosition gps_convert_ned(dji_sdk::GlobalPosition loc);
 

@@ -9,6 +9,7 @@ find_package(catkin REQUIRED COMPONENTS
   sensor_msgs
   message_generation
   nav_msgs
+  sensor_msgs
   roscpp
   rospy
   std_msgs
